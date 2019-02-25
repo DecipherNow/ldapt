@@ -17,99 +17,435 @@ limitations under the License.
 -->
 
 <head>
-    <style>
-        .outer {
-            display: table;
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-        }
+  <style>
+    /* Basics and Resets */
 
-        .middle {
-            display: table-cell;
-            vertical-align: middle;
-        }
+    html {
+      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+        "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+        "Helvetica Neue", sans-serif;
+    }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      transition-duration: 0s;
+    }
 
-        .inner {
-            margin-left: auto;
-            margin-right: auto;
-            width: 250px;
-        }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-        .textbox {
-            width: 100%;
-        }
+    *,
+    *:before,
+    *:after {
+      box-sizing: border-box;
+      overflow: visible;
+    }
 
-        .button {
-            float:left;
-        }
-    </style>
-    <script>
-        function onInput(element) {
-            var newPassword = document.getElementById("newPassword");
-            var newPasswordConfirm = document.getElementById("newPasswordConfirm");
-            if (newPassword.value !== newPasswordConfirm.value) {
-                newPasswordConfirm.setCustomValidity("Passwords do not match.")
-            } else {
-                newPasswordConfirm.setCustomValidity("")
-            }
-        }
+    * {
+      transition: all 0.3s ease;
+    }
 
-        function onSubmit() {
-            disable();
-            var payload = {
-                user: document.getElementById("username").value,
-                old: document.getElementById("password").value,
-                new: document.getElementById("newPassword").value
-            }
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "./api/passwords");
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 201) {
-                        alert("Password Changed");
-                        enable();
-                    } else {
-                        alert("Error Occured");
-                        enable();
-                    }
-                }
-            }
-            xhr.send(JSON.stringify(payload));
-        }
+    *:hover,
+    *:focus {
+      transition-duration: 0.15s;
+    }
 
-        function disable() {
-            document.getElementById("username").readonly = true;
-            document.getElementById("password").readonly = true;
-            document.getElementById("newPassword").readonly = true;
-            document.getElementById("newPasswordConfirm").readonly = true;
-            document.getElementById("button").disabled = true;
-        }
+    *:active {
+      transition-duration: 0;
+    }
 
-        function enable() {
-            document.getElementById("username").readonly = false;
-            document.getElementById("password").readonly = false;
-            document.getElementById("newPassword").readonly = false;
-            document.getElementById("newPasswordConfirm").readonly = false;
-            document.getElementById("button").disabled = false;
+    /* Form */
+
+    form {
+      display: flex;
+      flex-direction: column;
+      margin: auto;
+      width: 100%;
+      max-width: 30rem;
+      padding: 2rem 2rem;
+    }
+
+    @media all and (min-width: 25rem) {
+      form {
+        max-width: 25rem;
+      }
+    }
+
+    form * {
+      margin: 0.5rem 0 0;
+    }
+
+    form h1 {
+      margin-bottom: 2rem;
+      font-weight: normal;
+      color: #00ab2a;
+      width: 80%;
+    }
+
+    .input-label {
+      font-size: 12px;
+      margin-left: 0.25rem;
+      margin-bottom: 0.25rem;
+    }
+
+    hr {
+      border: 0;
+      border-bottom: 1px solid;
+      opacity: 0.08;
+      margin: 3rem auto 2rem;
+      width: 61.8%;
+    }
+
+    .textbox {
+      width: 100%;
+      border-radius: 100px;
+      border: 0;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 0 0 3px transparent;
+      padding: 0.5rem 1rem;
+      margin-top: 0.25rem;
+      font-size: 16px;
+    }
+    .textbox::placeholder {
+      opacity: 0;
+    }
+    .textbox:focus {
+      outline: none;
+      box-shadow: 0 0 0 1px transparent, 0 0 0 3px rgba(0, 171, 42, 0.7);
+    }
+
+    .button {
+      border-radius: 2rem;
+      border: 0;
+      padding: 0.5rem 1.25rem;
+      margin-left: auto;
+      margin-top: 2rem;
+      color: #fff;
+      font-weight: 500;
+      font-size: 1em;
+      background-color: #00ab2a;
+      box-shadow: 0 0 0 3px transparent;
+    }
+
+    .button:focus {
+      box-shadow: 0 0 0 3px rgba(0, 171, 42, 0.7);
+      outline: none;
+    }
+
+    /* App Header – cloned from Grey Matter UI Component Library */
+    .app-header {
+      background: #000;
+      color: #fff;
+      margin: 0;
+      padding: 0.72rem 2rem;
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+    }
+    .app-title {
+      font-weight: 500;
+      margin: auto 0;
+    }
+    .logo {
+      display: inline-block;
+      width: 20px;
+      margin: 0;
+      flex: 0 0 20px;
+      height: 20px;
+      margin-right: 10px;
+      background-image: url("data:image/svg+xml,%0A%3Csvg width='20px' height='20px' viewBox='0 0 20 20' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cg id='Artboard' transform='translate(-10.000000, -10.000000)' fill-rule='nonzero'%3E%3Cg id='Group' transform='translate(10.000000, 10.000000)'%3E%3Cpath d='M19.9712805,4.04504545 C19.9749261,5.68557216 18.9895023,7.16659006 17.4748983,7.79692016 C15.9602944,8.42725025 14.2150979,8.08262985 13.0537778,6.9238905 C11.8924577,5.76515115 11.5439557,4.02072562 12.1709147,2.50472312 C12.7978737,0.988720623 14.2766957,4.45185652e-06 15.9172264,4.01158295e-07 C16.9922627,-0.000477605233 18.0234318,0.426243858 18.7837663,1.18624039 C19.5441008,1.94623691 19.9712806,2.97721628 19.9712805,4.05225265' id='Path' fill='%2300AB2A'%3E%3C/path%3E%3Cpath d='M8.1082174,4.04504545 C8.11186323,5.6857361 7.12624451,7.16686826 5.61141911,7.79709292 C4.09659371,8.42731759 2.35125543,8.08236685 1.19007691,6.92325357 C0.0288984031,5.76414029 -0.319158758,4.01941884 0.308368293,2.50347395 C0.935895344,0.987529052 2.4152706,-0.000724745743 4.05596515,4.01158284e-07 C5.13100152,2.94887413e-07 6.16198089,0.427180115 6.92197742,1.18751457 C7.68197395,1.94784902 8.10869541,2.97901819 8.1082174,4.05405446' id='Path' fill='%23FFFFFF'%3E%3C/path%3E%3Cpath d='M15.9172264,11.8540545 C17.5572659,11.8533257 19.036188,12.8407971 19.6641406,14.3558567 C20.2920932,15.8709163 19.9453601,17.6150741 18.7856769,18.7747572 C17.6259938,19.9344404 15.881836,20.2811735 14.3667764,19.6532209 C12.8517168,19.0252683 11.8642454,17.5463462 11.8649742,15.9063067 C11.8649742,13.6683096 13.6792293,11.8540545 15.9172264,11.8540545' id='Path' fill='%23FFFFFF'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* App Footer – cloned from Grey Matter UI Component Library */
+    .app-footer {
+      -webkit-user-select: none;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      min-height: 32px;
+      padding: 0 16px;
+      -webkit-box-align: stretch;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+
+    .long-logo {
+      padding: 0 0 8px 8;
+      opacity: 0.7;
+      flex: 0 1 auto;
+      text-align: left;
+      transition: all 0.2s ease;
+      filter: grayscale(100%);
+    }
+    .long-logo:hover {
+      opacity: 1;
+      filter: grayscale(0%);
+    }
+
+    .long-logo img {
+      max-width: 140px;
+      vertical-align: -3px;
+    }
+
+    .copyright {
+      font-size: 60%;
+      margin: 8px 0 0;
+      flex: 0 0 100%;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      text-align: center;
+      cursor: default;
+      text-transform: uppercase;
+      order: 3;
+      white-space: pre-wrap;
+    }
+    .links {
+      flex: 1 0 auto;
+      text-align: right;
+      padding: 0 0 4px 8px;
+    }
+    .links a {
+      color: inherit;
+      opacity: 0.7;
+      padding-top: 0px;
+      padding-right: 4px;
+    }
+    .links a svg {
+      height: 18px;
+    }
+
+    @media (min-width: 800px) {
+      .app-footer {
+        flex: 0 0 40px;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: start;
+        justify-content: flex-start;
+      }
+      .links {
+        flex: 0 0 auto;
+      }
+      .copyright {
+        order: initial;
+        flex: 1 1 auto;
+        padding-top: 0;
+        margin-top: 0;
+        border: 0;
+      }
+    }
+  </style>
+  <link rel="shortcut icon" href="./favicon.ico" />
+  <script>
+    function onInput(element) {
+      var newPassword = document.getElementById("newPassword");
+      var newPasswordConfirm = document.getElementById("newPasswordConfirm");
+      if (newPassword.value !== newPasswordConfirm.value) {
+        newPasswordConfirm.setCustomValidity("Passwords do not match.");
+      } else {
+        newPasswordConfirm.setCustomValidity("");
+      }
+    }
+
+    function onSubmit() {
+      disable();
+      var payload = {
+        user: document.getElementById("username").value,
+        old: document.getElementById("password").value,
+        new: document.getElementById("newPassword").value
+      };
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "./api/passwords");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 201) {
+            alert("Password Changed");
+            enable();
+          } else {
+            alert("Error Occured");
+            enable();
+          }
         }
-    </script>
+      };
+      xhr.send(JSON.stringify(payload));
+    }
+
+    function disable() {
+      document.getElementById("username").readonly = true;
+      document.getElementById("password").readonly = true;
+      document.getElementById("newPassword").readonly = true;
+      document.getElementById("newPasswordConfirm").readonly = true;
+      document.getElementById("button").disabled = true;
+    }
+
+    function enable() {
+      document.getElementById("username").readonly = false;
+      document.getElementById("password").readonly = false;
+      document.getElementById("newPassword").readonly = false;
+      document.getElementById("newPasswordConfirm").readonly = false;
+      document.getElementById("button").disabled = false;
+    }
+  </script>
+  <title>Grey Matter | LDAP Password Reset</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 <body>
-    <div class="outer">
-        <div class="middle">
-            <div class="inner">
-                <form action="#" onsubmit="return onSubmit();">
-                    <input type="text" id="username" class="textbox" required="true" placeholder="Username" oninput="onInput(this);"/>
-                    <input type="password" id="password" class="textbox" required="true" placeholder="Password" oninput="onInput(this);"/>
-                    <input type="password" id="newPassword" class="textbox" required="true" placeholder="New Password" oninput="onInput(this);"/>
-                    <input type="password" id="newPasswordConfirm" class="textbox" required="true" placeholder="Confirm New Password" oninput="onInput(this);"/>
-                    <input type="submit" id="button" class="button" value="Change"/>
-                </form>
-            </div>
-        </div>
+  <header class="app-header">
+    <span class="logo"></span>
+    <p class="app-title">Grey Matter</p>
+  </header>
+
+  <form action="#" onsubmit="return onSubmit();">
+    <h1>Create a New Password</h1>
+
+    <label for="username">
+      <p class="input-label">Username</p>
+      <input
+        type="text"
+        autofocus
+        id="username"
+        class="textbox"
+        required="true"
+        placeholder="Username"
+        oninput="onInput(this);"
+      />
+    </label>
+    <label for="password">
+      <p class="input-label">Current Password</p>
+      <input
+        type="password"
+        id="password"
+        class="textbox"
+        required="true"
+        placeholder="Current Password"
+        oninput="onInput(this);"
+      />
+    </label>
+    <hr />
+    <label for="newPassword">
+      <p class="input-label">New Password</p>
+      <input
+        type="password"
+        id="newPassword"
+        class="textbox"
+        required="true"
+        placeholder="New Password"
+        oninput="onInput(this);"
+      />
+    </label>
+    <label for="newPasswordConfirm">
+      <p class="input-label">Confirm New Password</p>
+      <input
+        type="password"
+        id="newPasswordConfirm"
+        class="textbox"
+        required="true"
+        placeholder="Confirm New Password"
+        oninput="onInput(this);"
+      />
+    </label>
+    <input type="submit" id="button" class="button" value="Set New Password" />
+  </form>
+
+  <footer class="app-footer">
+    <a
+      class="long-logo"
+      href="http://deciphernow.com"
+      rel="noopener noreferrer"
+      target="_blank"
+      title="Decipher Technology Studios website"
+    >
+      <img
+        alt="Decipher Technology Studios"
+        src="data:image/png;base64,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"
+      />
+    </a>
+    <p class="copyright">
+      <span
+        >TM and &copy; <span id="footer-year"></span> Decipher Technology Studios</span
+      >
+    </p>
+    <div class="links">
+      <a
+        href="http://github.com/DecipherNow"
+        rel="noopener noreferrer"
+        target="_blank"
+        title="Decipher Technology Studios Github"
+        ><svg
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewBox="0 0 24 24"
+          preserveAspectRatio="xMaxYMax meet"
+          class="StyledSVG-eGvkBG hWCxJz"
+          focusable="false"
+          id="IconGitHub"
+        >
+          <g title="IconGitHub" fill="currentColor">
+            <title>IconGitHub</title>
+            &gt;
+            <path
+              d="M12 3c-4.97 0-9 4.04-9 9.022 0 3.99 2.58 7.368 6.16 8.56.45.08.61-.2.61-.43 0-.21-.01-.782-.01-1.534-2.5.541-3.03-1.213-3.03-1.213-.41-1.043-1-1.323-1-1.323-.82-.552.06-.552.06-.552.9.06 1.38.933 1.38.933.8 1.373 2.11.982 2.62.752.08-.582.31-.983.57-1.203-2-.231-4.1-1.003-4.1-4.461 0-.983.35-1.795.93-2.426-.09-.23-.4-1.143.09-2.386 0 0 .76-.24 2.47.922.72-.2 1.49-.3 2.25-.3s1.53.1 2.25.3c1.72-1.173 2.47-.922 2.47-.922.49 1.243.18 2.155.09 2.386.58.631.92 1.433.92 2.426 0 3.468-2.1 4.23-4.11 4.45.32.281.61.833.61 1.675 0 1.203-.01 2.175-.01 2.476 0 .24.16.52.62.43a9.018 9.018 0 0 0 6.16-8.56C21 7.04 16.97 3 12 3z"
+              fill-rule="nonzero"
+            ></path>
+          </g></svg></a
+      ><a
+        href="http://twitter.com/deciphernow"
+        rel="noopener noreferrer"
+        target="_blank"
+        title="Decipher Technology Studios Twitter"
+        ><svg
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewBox="0 0 24 24"
+          preserveAspectRatio="xMaxYMax meet"
+          class="StyledSVG-eGvkBG hWCxJz"
+          focusable="false"
+          id="IconTwitter"
+        >
+          <g title="IconTwitter" fill="currentColor">
+            <title>IconTwitter</title>
+            &gt;
+            <path
+              d="M21 6.65a7.7 7.7 0 0 1-2.088.551 3.551 3.551 0 0 0 1.598-1.935 7.394 7.394 0 0 1-2.309.844A3.694 3.694 0 0 0 15.546 5c-2.01 0-3.638 1.575-3.638 3.51 0 .275.032.54.095.796-3.027-.15-5.706-1.537-7.501-3.662a3.38 3.38 0 0 0-.493 1.765c0 1.215.642 2.287 1.619 2.913a3.707 3.707 0 0 1-1.65-.437v.038c0 1.697 1.256 3.12 2.92 3.445a4.173 4.173 0 0 1-1.643.057c.465 1.393 1.806 2.408 3.4 2.437a7.54 7.54 0 0 1-4.52 1.49c-.294 0-.583-.01-.869-.048a10.573 10.573 0 0 0 5.579 1.575c6.691 0 10.352-5.34 10.352-9.962 0-.152-.004-.303-.013-.455A7.276 7.276 0 0 0 21 6.65"
+              fill-rule="nonzero"
+            ></path>
+          </g></svg></a
+      ><a
+        href="http://www.linkedin.com/company/decipher-technology-studios"
+        rel="noopener noreferrer"
+        target="_blank"
+        title="Decipher Technology Studios LinkedIn"
+        ><svg
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewBox="0 0 24 24"
+          preserveAspectRatio="xMaxYMax meet"
+          class="StyledSVG-eGvkBG hWCxJz"
+          focusable="false"
+          id="IconLinkedIn"
+        >
+          <g title="IconLinkedIn" fill="currentColor">
+            <title>IconLinkedIn</title>
+            &gt;
+            <path
+              d="M7.63 20V9.206H4.201V20H7.63zM5.915 7.736v-.01h-.02C4.742 7.726 4 6.9 4 5.863 4 4.806 4.77 4 5.945 4c1.174 0 1.896.806 1.915 1.873 0 1.037-.75 1.863-1.944 1.863zM9.536 20s.038-9.787 0-10.794h3.417v1.57h-.02c.453-.745 1.272-1.822 3.12-1.822 2.253 0 3.947 1.54 3.947 4.853V20h-3.427v-5.78c0-1.45-.491-2.436-1.733-2.436-.953 0-1.511.664-1.762 1.309-.096.231-.115.553-.115.876V20H9.535z"
+              fill-rule="nonzero"
+            ></path>
+          </g>
+        </svg>
+      </a>
     </div>
+  </footer>
+  <script>
+    document.getElementById("footer-year").innerText = new Date().getFullYear();
+  </script>
 </body>
