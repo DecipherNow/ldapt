@@ -234,6 +234,7 @@ limitations under the License.
       }
     }
   </style>
+  <link rel="shortcut icon" href="./favicon.ico" />
   <script>
     function onInput(element) {
       var newPassword = document.getElementById("newPassword");
@@ -250,7 +251,7 @@ limitations under the License.
       var payload = {
         user: document.getElementById("username").value,
         old: document.getElementById("password").value,
-        new: document.getElementById("newPassword").value,
+        new: document.getElementById("newPassword").value
       };
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "./api/passwords");
@@ -360,7 +361,8 @@ limitations under the License.
     </a>
     <p class="copyright">
       <span
-        >TM and &copy; <span id="footer-year"></span> Decipher Technology Studios</span
+        >TM and &copy; <span id="footer-year"></span> Decipher Technology
+        Studios</span
       >
     </p>
     <div class="links">
