@@ -405,7 +405,9 @@ limitations under the License.
       />
     </a>
     <p class="copyright">
-      <span>TM and &copy; 2019 Decipher Technology Studios</span>
+      <span
+        >TM and &copy; <span id="footer-year"></span> Decipher Technology Studios</span
+      >
     </p>
     <div class="links">
       <a
@@ -481,4 +483,7 @@ limitations under the License.
       </a>
     </div>
   </footer>
+  <script>
+    document.getElementById("footer-year").innerText = new Date().getFullYear();
+  </script>
 </body>
