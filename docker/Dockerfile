@@ -1,15 +1,12 @@
-FROM alpine:3.8 as builder
+FROM golang:1.11.4-alpine3.8 as builder
 
-ENV GOPATH /go
-
-RUN apk --no-cache add \
-  dep \
+RUN apk add --no-cache \
+  gcc \
   git \
-  go \
   libc-dev \
   make
 
-WORKDIR /go/src/github.com/deciphernow/ldapt
+WORKDIR /usr/local/src/ldapt
 
 COPY . .
 
@@ -25,7 +22,7 @@ ENV LDAP_TEMPLATE "(uid=%s)"
 ENV LDAP_DISTINGUISHED_NAME "cn=ldapt,ou=services,dc=example,dc=com"
 ENV LDAP_PASSWORD "password"
 
-COPY --from=builder /go/src/github.com/deciphernow/ldapt/ldapt /usr/local/bin/ldapt
+COPY --from=builder /usr/local/src/ldapt/ldapt /usr/local/bin/ldapt
 COPY ./docker/files/ /
 
 RUN chown -R 0:0 /etc/ldapt

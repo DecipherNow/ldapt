@@ -13,18 +13,14 @@
 # limitations under the License.
 
 .PHONY: build
-build: vendor
+build:
 	@echo "---> Generating assets."
 	@go generate
 	@echo "---> Building binaries."
 	@go build -o ldapt -ldflags "-X main.commit=$(git rev-parse --verify --short HEAD) -X main.version=$(cat VERSION)" 
 
-.PHONY: vendor
-vendor:
-	@echo "---> Installing dependencies from Gopkg.lock."
-	@dep ensure -v -vendor-only
 
 .PHONY: docker
-docker: vendor
+docker:
 	@echo "---> Building docker image."
 	@docker build -t "deciphernow/ldapt:$(shell cat VERSION)" -f ./docker/Dockerfile .
